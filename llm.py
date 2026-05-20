@@ -1,6 +1,7 @@
 import os
+import time
 
-from openai import OpenAI
+from openai import OpenAI, RateLimitError
 
 
 def _require_env(name: str) -> str:
