@@ -12,8 +12,5 @@ def run():
 if __name__ == "__main__":
     try:
         run()
-    except Exception:
-        import traceback
-
-        traceback.print_exc()
-        raise
+    except Exception as e:
+        raise SystemExit(str(e)) from e
