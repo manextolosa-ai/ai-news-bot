@@ -34,7 +34,7 @@ Noticias:
 {text}
 """
 
-        def _fallback(reason: str) -> str:
+    def _fallback(reason: str) -> str:
         lines = [
             "No pude generar el briefing con OpenAI (cuota/billing).",
             f"Motivo: {reason}",
@@ -56,6 +56,6 @@ Noticias:
             msg = str(e)
             if "insufficient_quota" in msg:
                 return _fallback("insufficient_quota: revisa Billing/créditos de OpenAI")
-            time.sleep(2 ** attempt)
+            time.sleep(2**attempt)
 
     return _fallback("Rate limit temporal (reintentos agotados)")
