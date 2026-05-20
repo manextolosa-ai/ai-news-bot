@@ -34,9 +34,28 @@ Noticias:
 {text}
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-    )
+        def _fallback(reason: str) -> str:
+        lines = [
+            "No pude generar el briefing con OpenAI (cuota/billing).",
+            f"Motivo: {reason}",
+            "",
+            "Titulares de hoy:",
+        ]
+        for a in articles[:10]:
+            lines.append(f"- {a.get('title','(sin título)')} ({a.get('link','')})")
+        return "\n".join(lines)
 
-    return response.choices[0].message.content
+    for attempt in range(3):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return response.choices[0].message.content
+        except RateLimitError as e:
+            msg = str(e)
+            if "insufficient_quota" in msg:
+                return _fallback("insufficient_quota: revisa Billing/créditos de OpenAI")
+            time.sleep(2 ** attempt)
+
+    return _fallback("Rate limit temporal (reintentos agotados)")
